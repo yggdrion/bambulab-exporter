@@ -1,3 +1,13 @@
+## [1.1.0](https://github.com/yggdrion/bambulab-exporter/compare/v1.0.0...v1.1.0) (2025-11-30)
+
+### ✨ Features
+
+* printer online gauge ([1bb0c89](https://github.com/yggdrion/bambulab-exporter/commit/1bb0c8916754ddbbe057704cf3328eea46a30f30))
+
+### 🔧 Chores
+
+* **go:** Update go ([#2](https://github.com/yggdrion/bambulab-exporter/issues/2)) ([65d38bb](https://github.com/yggdrion/bambulab-exporter/commit/65d38bb1dd5b0aff6f603d81f66c9a979d0743d7))
+
 ## 1.0.0 (2025-11-30)
 
 ### ✨ Features
