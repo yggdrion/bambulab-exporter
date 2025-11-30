@@ -1,5 +1,15 @@
 ## 1.0.0 (2025-11-30)
 
+### ✨ Features
+
+* init ([b573852](https://github.com/yggdrion/bambulab-exporter/commit/b573852b3293d6e5b18db5b04a2d9d59eca6ff76))
+
+### 🐛 Bug Fixes
+
+* readme add original mention ([a304d14](https://github.com/yggdrion/bambulab-exporter/commit/a304d1484185113a2873b1120e18767bff4f24cb))
+
+## 1.0.0 (2025-11-30)
+
 ### Bug Fixes
 
 * .env ([417f551](https://github.com/yggdrion/bambulab-exporter/commit/417f551df0d1e432312e444b2efebcd78d3ff47e))
