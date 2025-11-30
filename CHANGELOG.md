@@ -1,0 +1,16 @@
+## 1.0.0 (2025-11-30)
+
+### Bug Fixes
+
+* .env ([417f551](https://github.com/yggdrion/bambulab-exporter/commit/417f551df0d1e432312e444b2efebcd78d3ff47e))
+* .env ([4f3a479](https://github.com/yggdrion/bambulab-exporter/commit/4f3a479a12e29d25023583ad4528dbd3aa058760))
+* dockerfile ([e1ba94b](https://github.com/yggdrion/bambulab-exporter/commit/e1ba94b219dc1a754cf75c4bbc4e6a08991c8a18))
+* dockerfile ([372f454](https://github.com/yggdrion/bambulab-exporter/commit/372f454c8787ffa2944aa226f84703d3276a9983))
+* gitignore, typos and releaserc ([a60d225](https://github.com/yggdrion/bambulab-exporter/commit/a60d2250c457c9a09058ee14ed469d6610e00505))
+* golint ([8dde12b](https://github.com/yggdrion/bambulab-exporter/commit/8dde12b68f4bfe97c8132bcfd2423827b0271bd0))
+* imports ([4dfaf67](https://github.com/yggdrion/bambulab-exporter/commit/4dfaf6736d433daac786c23c7fb1bba6fa8802c7))
+* log level env ([2bb2d96](https://github.com/yggdrion/bambulab-exporter/commit/2bb2d963fb1373df9348f2f4ae8503f0ecd306ff))
+
+### Features
+
+* workflows and renovate ([ef5b9d9](https://github.com/yggdrion/bambulab-exporter/commit/ef5b9d91af6a4383aa22e74f5f4dd0b7327dadc4))
