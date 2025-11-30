@@ -1,20 +1,20 @@
 package mqtt
 
 import (
+	"bambulab-exporter/collector"
+	"bambulab-exporter/config"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"time"
 
-	"bambulab-exporter/config"
-
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/rs/zerolog/log"
 )
 
-var errChan chan error = make(chan error, 1)
-
 func Start(reportReceiver func(report map[string]any)) <-chan error {
+	errChan := make(chan error, 1)
+
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("ssl://%s:%d", config.PrinterHost, 8883))
 	opts.SetClientID("bambulab-exporter")
@@ -24,36 +24,41 @@ func Start(reportReceiver func(report map[string]any)) <-chan error {
 	opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true})
 	opts.SetAutoReconnect(true)
 	opts.SetConnectRetry(true)
-	opts.SetConnectRetryInterval(1 * time.Second)
-	opts.OnConnect = onConnect
+	opts.SetConnectRetryInterval(5 * time.Second)
+	opts.SetMaxReconnectInterval(30 * time.Second)
+	opts.OnConnect = onConnect(reportReceiver)
 	opts.OnConnectionLost = onConnectionLost
 
 	client := mqtt.NewClient(opts)
-	tok := client.Connect()
-	tok.Wait()
-	if err := tok.Error(); err != nil {
-		errChan <- err
-		return errChan
-	}
 
-	token := client.Subscribe(fmt.Sprintf("device/%s/report", config.PrinterSerial), 0, onMessage(reportReceiver))
 	go func() {
-		<-token.Done()
-		if err := token.Error(); err != nil {
-			errChan <- err
+		tok := client.Connect()
+		tok.Wait()
+		if err := tok.Error(); err != nil {
+			log.Warn().Err(err).Msg("Initial connection failed, will retry automatically")
+			collector.MarkOffline()
 		}
 	}()
 
 	return errChan
 }
 
-func onConnect(client mqtt.Client) {
-	log.Info().Msg("Connected to MQTT broker")
+func onConnect(reportReceiver func(report map[string]any)) func(mqtt.Client) {
+	return func(client mqtt.Client) {
+		log.Info().Msg("Connected to MQTT broker")
+
+		token := client.Subscribe(fmt.Sprintf("device/%s/report", config.PrinterSerial), 0, onMessage(reportReceiver))
+		token.Wait()
+		if err := token.Error(); err != nil {
+			log.Error().Err(err).Msg("Failed to subscribe to MQTT topic")
+			collector.MarkOffline()
+		}
+	}
 }
 
 func onConnectionLost(client mqtt.Client, err error) {
-	log.Error().Err(err).Msg("Connection lost")
-	errChan <- err
+	log.Warn().Err(err).Msg("Connection lost, will attempt to reconnect")
+	collector.MarkOffline()
 }
 
 func onMessageDefault(client mqtt.Client, msg mqtt.Message) {

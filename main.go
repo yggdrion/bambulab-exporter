@@ -17,6 +17,8 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 
+	collector.MarkOffline()
+
 	apiErrChan := api.Start()
 	mqttErrChan := mqtt.Start(collector.ReceiveReport)
 
@@ -26,6 +28,6 @@ func main() {
 	case err := <-apiErrChan:
 		log.Fatal().Err(err).Msg("API error")
 	case err := <-mqttErrChan:
-		log.Fatal().Err(err).Msg("MQTT error")
+		log.Error().Err(err).Msg("MQTT error")
 	}
 }

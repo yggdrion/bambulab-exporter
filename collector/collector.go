@@ -1,6 +1,8 @@
 package collector
 
 import (
+	"bambulab-exporter/config"
+	"bambulab-exporter/metrics"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,6 +35,8 @@ func isNewUnknownField(reportType, reportKey string) bool {
 }
 
 func ReceiveReport(report map[string]any) {
+	metrics.PrinterOnline.WithLabelValues(config.PrinterName).Set(1)
+
 	for key, value := range report {
 		switch key {
 		case "print":
@@ -48,6 +52,10 @@ func ReceiveReport(report map[string]any) {
 			}
 		}
 	}
+}
+
+func MarkOffline() {
+	metrics.PrinterOnline.WithLabelValues(config.PrinterName).Set(0)
 }
 
 // safeFloat64 converts a value to float64, returning 0 if conversion fails

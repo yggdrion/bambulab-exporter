@@ -4,6 +4,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var PrinterOnline = makeCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	Name: metricPrefix + "printer_online",
+	Help: "Printer online status (1 = online, 0 = offline)",
+}, []string{"printer"}))
+
 var OnlineAhb = makeCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Name: metricPrefix + "online_ahb",
 	Help: "Online AHB status (1 = online, 0 = offline)",
