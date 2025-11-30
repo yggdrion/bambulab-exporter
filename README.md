@@ -1,5 +1,7 @@
 # Bambulab Exporter
 
+based on: https://github.com/Scrin/bambulab-exporter
+
 A prometheus exporter for Bambu Lab 3D printers, pulling metrics directly from the printer using MQTT. This works for both "cloud" and "LAN Only" modes. Tested with the P1S and one AMS, but this likely works for others configurations as well.
 
 A sample of the provided metrics can be found in [metrics-sample.txt](./metrics-sample.txt). (note: this sample is not guaranteed to be 100% up to date at all times)
