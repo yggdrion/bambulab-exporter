@@ -17,15 +17,18 @@ func Start(reportReceiver func(report map[string]any)) <-chan error {
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("ssl://%s:%d", config.PrinterHost, 8883))
-	opts.SetClientID("bambulab-exporter")
+	opts.SetClientID(fmt.Sprintf("bambulab-exporter-%d", time.Now().Unix()))
 	opts.SetUsername("bblp")
 	opts.SetPassword(config.PrinterAccessCode)
 	opts.SetDefaultPublishHandler(onMessageDefault)
 	opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true})
+	opts.SetKeepAlive(5 * time.Second)
+	opts.SetPingTimeout(3 * time.Second)
+	opts.SetCleanSession(true)
 	opts.SetAutoReconnect(true)
 	opts.SetConnectRetry(true)
-	opts.SetConnectRetryInterval(5 * time.Second)
-	opts.SetMaxReconnectInterval(30 * time.Second)
+	opts.SetConnectRetryInterval(1 * time.Second)
+	opts.SetMaxReconnectInterval(5 * time.Second)
 	opts.OnConnect = onConnect(reportReceiver)
 	opts.OnConnectionLost = onConnectionLost
 

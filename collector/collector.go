@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -13,6 +14,12 @@ import (
 // seenUnknownKeys tracks which unknown keys have already been logged
 var seenUnknownKeys = make(map[string]bool)
 var seenUnknownKeysMutex sync.RWMutex
+
+// offlineTimer tracks when to clear metrics after prolonged disconnection
+var offlineTimer *time.Timer
+var offlineTimerMutex sync.Mutex
+
+const offlineGracePeriod = 30 * time.Second
 
 // isNewUnknownField checks if an unknown field has been seen before.
 // It returns true if the field has not been seen before, and false otherwise.
@@ -37,6 +44,14 @@ func isNewUnknownField(reportType, reportKey string) bool {
 func ReceiveReport(report map[string]any) {
 	metrics.PrinterOnline.WithLabelValues(config.PrinterName).Set(1)
 
+	// Cancel offline timer since we received a report
+	offlineTimerMutex.Lock()
+	if offlineTimer != nil {
+		offlineTimer.Stop()
+		offlineTimer = nil
+	}
+	offlineTimerMutex.Unlock()
+
 	for key, value := range report {
 		switch key {
 		case "print":
@@ -56,6 +71,18 @@ func ReceiveReport(report map[string]any) {
 
 func MarkOffline() {
 	metrics.PrinterOnline.WithLabelValues(config.PrinterName).Set(0)
+
+	// Start a timer to clear metrics after grace period
+	// This prevents clearing metrics during brief connection drops
+	offlineTimerMutex.Lock()
+	if offlineTimer != nil {
+		offlineTimer.Stop()
+	}
+	offlineTimer = time.AfterFunc(offlineGracePeriod, func() {
+		log.Info().Msg("Printer offline for grace period, clearing metrics")
+		metrics.ClearAllMetrics(config.PrinterName)
+	})
+	offlineTimerMutex.Unlock()
 }
 
 // safeFloat64 converts a value to float64, returning 0 if conversion fails
